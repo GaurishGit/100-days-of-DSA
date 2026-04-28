@@ -1,45 +1,52 @@
+/*
+Problem Statement:
+Print the nodes visible when the binary tree is viewed from the right side.
+
+Input Format:
+- First line contains integer N
+- Second line contains level-order traversal (-1 indicates NULL)
+
+Output Format:
+- Print right view nodes
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 
-// Tree Node
-struct TreeNode {
-    int val;
-    struct TreeNode *left;
-    struct TreeNode *right;
+struct Node {
+    int data;
+    struct Node* left;
+    struct Node* right;
 };
 
-// Create new node
-struct TreeNode* createNode(int val) {
-    struct TreeNode* node = (struct TreeNode*)malloc(sizeof(struct TreeNode));
-    node->val = val;
+struct Node* newNode(int data) {
+    struct Node* node = (struct Node*)malloc(sizeof(struct Node));
+    node->data = data;
     node->left = node->right = NULL;
     return node;
 }
 
-// Build tree from level order
-struct TreeNode* buildTree(int arr[], int n) {
+struct Node* buildTree(int arr[], int n) {
     if (n == 0 || arr[0] == -1) return NULL;
 
-    struct TreeNode* root = createNode(arr[0]);
-
-    struct TreeNode* queue[2000];
+    struct Node* root = newNode(arr[0]);
+    struct Node** queue = (struct Node**)malloc(n * sizeof(struct Node*));
     int front = 0, rear = 0;
 
     queue[rear++] = root;
-
     int i = 1;
 
     while (i < n) {
-        struct TreeNode* curr = queue[front++];
+        struct Node* curr = queue[front++];
 
         if (arr[i] != -1) {
-            curr->left = createNode(arr[i]);
+            curr->left = newNode(arr[i]);
             queue[rear++] = curr->left;
         }
         i++;
 
         if (i < n && arr[i] != -1) {
-            curr->right = createNode(arr[i]);
+            curr->right = newNode(arr[i]);
             queue[rear++] = curr->right;
         }
         i++;
@@ -48,11 +55,10 @@ struct TreeNode* buildTree(int arr[], int n) {
     return root;
 }
 
-// Print right view
-void rightView(struct TreeNode* root) {
-    if (root == NULL) return;
+void rightView(struct Node* root) {
+    if (!root) return;
 
-    struct TreeNode* queue[2000];
+    struct Node** queue = (struct Node**)malloc(1000 * sizeof(struct Node*));
     int front = 0, rear = 0;
 
     queue[rear++] = root;
@@ -61,29 +67,30 @@ void rightView(struct TreeNode* root) {
         int size = rear - front;
 
         for (int i = 0; i < size; i++) {
-            struct TreeNode* node = queue[front++];
+            struct Node* temp = queue[front++];
 
-            if (i == size - 1) {
-                printf("%d ", node->val);
-            }
+            if (i == size - 1)
+                printf("%d ", temp->data);
 
-            if (node->left) queue[rear++] = node->left;
-            if (node->right) queue[rear++] = node->right;
+            if (temp->left)
+                queue[rear++] = temp->left;
+
+            if (temp->right)
+                queue[rear++] = temp->right;
         }
     }
 }
 
-// Main
 int main() {
     int n;
     scanf("%d", &n);
 
-    int arr[n];
-    for (int i = 0; i < n; i++) {
-        scanf("%d", &arr[i]);
-    }
+    int* arr = (int*)malloc(n * sizeof(int));
 
-    struct TreeNode* root = buildTree(arr, n);
+    for (int i = 0; i < n; i++)
+        scanf("%d", &arr[i]);
+
+    struct Node* root = buildTree(arr, n);
 
     rightView(root);
 
